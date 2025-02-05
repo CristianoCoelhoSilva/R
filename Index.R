@@ -41,26 +41,6 @@ ggsave(
   dpi = 640
 )
 
-
-
-# Calcular a diferença do logaritmo de 'indice'
-dados <- dados %>%
-  arrange(Data) %>%  # Garantir que os dados estão ordenados por Data
-  mutate(diff_log_indice = c(NA, diff(log(indice))))  # Calcula a diferença logarítmica
-
-# Plotando os dados com a transformação diff(log(indice))
-index <- ggplot(dados, aes(x = Data, y = diff_log_indice, color = valore)) +
-  geom_line(color = "blue", size = 1) +
-  labs(title = "Série", x = "Data", y = "Diferença Log(Indice)") + 
-  scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
-  facet_wrap(facets = ~valor, scales = "free_y") +  
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(x = "Data", y = "Diferença Log(Indice)")
-
-# Exibindo o gráfico
-print(index)
-
 # Calcular a diferença logarítmica por grupo na coluna 'Indice'
 dados <- dados %>%
   arrange(Indice, Data) %>%  # Garantir que os dados estão ordenados por 'name' e 'Data'
@@ -69,8 +49,8 @@ dados <- dados %>%
   ungroup()  # Desagrupar após a transformação
 
 # Plotando os dados com a transformação diff(log(indice)) por grupo 'name'
-index <- ggplot(dados, aes(x = Data, y = diff_log_indice, color = name)) +
-  geom_line(size = 0.5, color = "blue", ) +
+index <- ggplot(dados, aes(x = Data, y = diff_log_indice, color = Indice)) +
+  geom_line(size = 0.5, color = "blue") +
   labs(title = "Série", x = "Data", y = "Diferença Log(Indice)") + 
   scale_x_date(date_labels = "%Y", date_breaks = "1 year") +
   facet_wrap(facets = ~Indice, scales = "free_y") +  
