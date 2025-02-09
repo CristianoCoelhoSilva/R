@@ -12,18 +12,28 @@ if (interactive()) {
     }
   )
   #----------------------- More advanced example -----------------
-  df_data = data.frame(x = c('2014-06-11',
-                             '2014-06-12',
-                             '2014-06-13',
-                             '2014-06-14',
-                             '2014-06-15',
-                             '2014-06-16'),
-                       y = c(10,
-                             1,
-                             30000,
-                             10,
-                             150,
-                             30000))
+  # Definir o caminho para o arquivo Excel
+  arquivo_excel <- "DADOS/setores_brasil.xlsx"
+  
+  # Ler a planilha
+  dados <- read_excel(arquivo_excel)
+
+  dados <- dados %>%
+  pivot_longer(cols = starts_with("MXBR"),  # Seleciona as colunas que começam com "MXBR"
+               names_to = "Indice",         # Cria a coluna "Indice" com o nome das colunas antigas
+               values_to = "Valor")        # Cria a coluna "Valor" com os valores
+
+  #Convertendo as variáveis
+  dados$Data <- as.Date(dados$dates, format = "%Y-%m-%d")
+  dados$Valor <- as.numeric(gsub(",", ".", dados$Valor))
+
+  dados1 <- dados %>% filter(Indice == "MXBR Index")
+
+  x = dados1$dates
+  y = dados1$Valor
+
+df_data = data.frame(x = c(x), y = c(y))
+
   ui <- fluidPage(
     linevisOutput("appts",width = "100%", height = "auto"),
     div("Visible window:", textOutput("window", inline = TRUE)),
@@ -42,3 +52,4 @@ if (interactive()) {
   }
   shinyApp(ui, server)
 }
+
