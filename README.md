@@ -13,3 +13,10 @@ bitcoin
 
 https://br.investing.com/crypto/bitcoin/historical-data
 
+Trump
+
+https://www.bitget.com/pt/price/official-trump/historical-data#download
+
+Melina
+
+
