@@ -1,4 +1,4 @@
 library("patterncausality")
 library("MCMCpack")
 
-state_space <- stateSpace(climate_indices$PNA,3,2)
+state_space <- stateSpace(DATA_COMMODITIES$Gold,3,2)
