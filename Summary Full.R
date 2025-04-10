@@ -1,15 +1,5 @@
-calcular_estatisticas_excel <- function(path_file) {
-  # Ler o arquivo Excel
-  data <- read_excel(path_file)
-  
-  # Selecionar colunas específicas
-  data <- data[, c(2, 3, 4, 5, 6, 7, 8, 9)]
-  
-  # Converter vírgulas em pontos e transformar em numérico
-  for (col in names(data)) {
-    data[[col]] <- as.numeric(gsub(",", ".", data[[col]]))
-  }
-  
+calcular_estatisticas <- function(data) {
+ 
   # Função para calcular estatísticas
   calcular_estatisticas <- function(coluna) {
     media <- mean(coluna, na.rm = TRUE)
