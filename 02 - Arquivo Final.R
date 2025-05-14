@@ -4,7 +4,18 @@ library(dplyr)
 library(lubridate)
 library(purrr) # Carregando o pacote purrr
 
-ANO <- '2019'
+# Função para gerar a sequência de anos
+lista_range_ano <- function(inicio, fim) {
+  return(inicio:fim)
+}
+
+# Define o intervalo de anos
+anos <- lista_range_ano(2008, 2015)
+
+
+for (ano in anos) {
+
+ANO <- ano
 
 diretorio_origem <- paste0('TEMPERATURA/DADOS/', ANO, '/TRATADO/')
 
@@ -18,3 +29,5 @@ dados <- arquivos_para_mover %>%
 nome_arquivo_csv <- paste0('TEMPERATURA/DADOS/ARQUIVOS/', ANO, ".csv")
 
 write.csv(dados, file = nome_arquivo_csv, row.names = FALSE, fileEncoding = "UTF-8")
+
+}

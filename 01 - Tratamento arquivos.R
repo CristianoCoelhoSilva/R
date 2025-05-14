@@ -3,7 +3,7 @@ library(tidyr)
 library(dplyr)
 library(lubridate)
 
-ANO <- '2022'
+ANO <- '2008'
 
 diretorio_origem <- paste0('TEMPERATURA/DADOS/', ANO)
 
