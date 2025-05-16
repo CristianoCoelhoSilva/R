@@ -1,12 +1,23 @@
 library(lubridate)
 library(lubridate)
 library(stringr)
+library(readr)
+source("TEMPERATURA/Normais INPE.R")
 
-source("TEMPERATURA/Normais.R")
+lista_range_ano <- function(inicio, fim) {
+  return(inicio:fim)
+}
 
-normais <- normais_estacoes(FALSE)
+anos <- lista_range_ano(2008, 2023)
 
-nome_arquivo_temperatura <- paste0("TEMPERATURA/DADOS/DADOS_INPE/ARQUIVOS/", 2023, ".csv")
+
+for (ano in anos) {
+
+ano_desejado <- ano
+
+normais <- normais_estacoes()
+
+nome_arquivo_temperatura <- paste0("TEMPERATURA/DADOS/DADOS_INPE/ARQUIVOS/", ano_desejado, ".csv")
 dados <- read_csv(nome_arquivo_temperatura)
 
 dados <- dados %>%
@@ -34,26 +45,36 @@ dados <- dados %>%
   rename_with(tolower) %>%
   inner_join(
     normais %>% rename_with(tolower),
-    by = c("codigo_estacao" = "id_estacao", "mes" = "mês"),
+    by = c("codigo_estacao" = "id_estacao", "mes" = "mes"),
     relationship = "many-to-many"
   )
 
 dados <- dados %>%
   mutate(
-    flag_temp_maior = ifelse(temperatura_maxima > maxima, 1, 0)
+    flag_temp_maior = ifelse(temperatura_maxima > temp_maxima, 1, 0)
   )
 
 dados <- dados %>%
   mutate(
-    flag_temp_menor = ifelse(temperatura_minima < minima, 1, 0)
+    flag_temp_menor = ifelse(temperatura_minima < temp_minima, 1, 0)
   )
 
 dados <- dados %>%
   mutate(
-    diff_temp_maior = temperatura_maxima - maxima
+    diff_temp_maior = temperatura_maxima - temp_maxima
   )
 
 dados <- dados %>%
   mutate(
-    diff_temp_menor = temperatura_minima - minima
+    diff_temp_menor = temperatura_minima - temp_minima
   )
+
+dados <- dados[c("data","mes","id","estacao","uf","codigo_estacao","temperatura_maxima","temperatura_minima","temp_maxima","temp_minima","flag_temp_maior","flag_temp_menor","diff_temp_maior","diff_temp_menor")]
+
+colnames(dados)[colnames(dados) == "temp_maxima"] <- "temp_maxima_normais"
+colnames(dados)[colnames(dados) == "temp_minima"] <- "temp_minima_normais"
+colnames(dados)[colnames(dados) == "id"] <- "IBGE"
+
+
+nome_arquivo_saida <- paste0('TEMPERATURA/DADOS/DADOS_TEMPERATURA_NORMAIS/TEMPERATURA_', ano_desejado, '.csv')
+write.csv(dados, file = nome_arquivo_saida, row.names = FALSE, quote = TRUE, na = "")}

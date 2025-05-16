@@ -6,11 +6,10 @@ lista_range_ano <- function(inicio, fim) {
 }
 
 # Define o intervalo de anos
-anos <- lista_range_ano(2019, 2019)
+anos <- lista_range_ano(2003, 2005)
 
-# Loop através dos anos
+
 for (ano in anos) {
-  # 1. Especifique o caminho da pasta usando o ano atual
   pasta_ano <- paste0("C:/Users/cristiano.silva/Documents/PROJETO/DADOS/", ano, "/") # Adicionei uma barra no final para garantir que é um diretório
   
   # 2. Liste todos os arquivos CSV na pasta do ano
@@ -23,14 +22,20 @@ for (ano in anos) {
   if (length(arquivos_csv) > 0) { # Adiciona verificação se há arquivos para processar
     for (arquivo_csv in arquivos_csv) { # Renomeei a variável do loop para evitar confusão
       dados <- read.csv(arquivo_csv, header = TRUE, sep = ",", encoding = "UTF-8")
+      
+      colnames(dados) <- tolower(colnames(dados))
+      dados <- dados[, c("contador", "codmunres", "codmunres", "idade", "def_sexo", "def_raca_cor", "def_escol", "causabas_capitulo", "causabas_categoria", "causabas_grupo", "causabas_subcategoria", "idade_obito", "ano_obito", "dtobito")]
+      
+      
+      
       lista_de_dados[[arquivo_csv]] <- dados
-    }
+      
+      print(arquivo_csv)
+      }
     
-    # 5. Combine todos os data frames em um único, se houver arquivos
     dados_combinados <- do.call(rbind, lista_de_dados)
     
-    # 6. Especifique o nome do arquivo de saída usando o ano atual
-    nome_arquivo_saida <- paste0("C:/Users/cristiano.silva/Documents/PROJETO/DADOS/COMBINADOS_", ano, ".csv") # Nome de arquivo diferente para cada ano
+    nome_arquivo_saida <- paste0("C:/Users/cristiano.silva/Documents/PROJETO/DADOS/FINAL", ano, ".csv") # Nome de arquivo diferente para cada ano
     
     # 7. Escreva o data frame para um arquivo CSV
     write.csv(dados_combinados, file = nome_arquivo_saida, row.names = FALSE, quote = TRUE, na = "")
