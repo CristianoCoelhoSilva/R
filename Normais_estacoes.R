@@ -101,23 +101,19 @@ rm(list = setdiff(ls(), c("normal")))
 
 normal_pivot <- normal %>%
   mutate(across(Janeiro:Dezembro, ~ as.numeric(gsub(",", ".", .)))) %>%
-  # 2. Pivotar as colunas de mês para linhas
   pivot_longer(
-    cols = Janeiro:Dezembro, # As colunas que queremos pivotar
-    names_to = "Mes",        # Nome da nova coluna que armazenará os nomes dos meses
-    values_to = "Temperatura" # Nome da nova coluna que armazenará os valores de temperatura
+    cols = Janeiro:Dezembro,
+    names_to = "Mes",
+    values_to = "Temperatura"
   ) %>%
-  # 3. Criar as colunas 'Max' e 'Min' a partir da coluna 'TIPO' e 'Temperatura'
   pivot_wider(
-    names_from = TIPO,     # A coluna 'TIPO' vai virar os nomes das novas colunas
-    values_from = Temperatura # Os valores da coluna 'Temperatura' vão preencher as novas colunas
+    names_from = TIPO,
+    values_from = Temperatura
   ) %>%
-  # Opcional: Reordenar as colunas para melhor visualização
   select(SG_ESTADO, DC_NOME, Codigo_IBGE, Mes, Max, Min) %>%
-  # Opcional: Organizar por estado, cidade e mês
   arrange(SG_ESTADO, DC_NOME, Mes)
 
 normal_pivot$Mes <- toupper(normal_pivot$Mes)
 
-write_xlsx(normal, path = "TEMPERATURA/NORMAIS/Normais.xlsx")
-write_xlsx(normal, path = "TEMPERATURA/NORMAIS/Normais_pivot.xlsx")
+#write_xlsx(normal, path = "TEMPERATURA/NORMAIS/Normais.xlsx")
+#write_xlsx(normal, path = "TEMPERATURA/NORMAIS/Normais_pivot.xlsx")

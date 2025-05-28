@@ -27,3 +27,9 @@ temperatura$temperatura_minima[is.infinite(temperatura$temperatura_minima)] <- N
 
 temperatura$diff_max <- temperatura$temperatura_maxima - temperatura$Max
 temperatura$diff_min <- temperatura$temperatura_minima - temperatura$Min
+
+temperatura <- temperatura %>%
+  mutate(anomalia_max = ifelse(diff_max >= 5, 1, 0)) %>%
+  mutate(anomalia_min = ifelse(diff_min <= -5, 1, 0))
+
+rm(list = setdiff(ls(), c("temperatura")))
