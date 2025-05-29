@@ -7,9 +7,10 @@ temperatura <- read_csv("TEMPERATURA/TEMPERATURA/AUTOMATICAS/2023.csv")
 
 temperatura <- temperatura %>%
   mutate(
-    DATA = ymd(DATA), 
-    Mes = month(DATA, label = TRUE, abbr = FALSE) 
+    DATA = ymd(DATA), # Garante que DATA é um objeto de data
+    Mes = format(DATA, "%B") # %B retorna o nome completo do mês
   )
+
 
 temperatura <- temperatura[c(1,4,5,6,2,3)]
 
@@ -48,7 +49,7 @@ temperatura <- temperatura %>%
   )
 
 temperatura$diff_max <- temperatura$media_temperatura_maxima - temperatura$media_max
-temperatura$diff_min <- temperatura$media_temperatura_minima - temperatura$media_max
+temperatura$diff_min <- temperatura$media_temperatura_minima - temperatura$media_min
 
 temperatura <- temperatura %>%
   mutate(anomalia_max = ifelse(diff_max >= 5, 1, 0)) %>%
