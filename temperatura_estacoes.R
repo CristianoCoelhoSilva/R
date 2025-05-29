@@ -1,13 +1,9 @@
 library(dplyr)
 library(lubridate)
+library(dplyr)
+library(lubridate)
 
-estacoesAuto <-  read.delim("TEMPERATURA/ESTACOES/CatalogoEstaçõesAutomáticas.csv", sep = ";", header = TRUE, dec = ",", fileEncoding = "latin1")
-
-base2023 <- read_csv("TEMPERATURA/TEMPERATURA/AUTOMATICAS/2023.csv")
-
-temperatura <- base2023 %>%
-  inner_join(estacoesAuto, by = c("CODIGO_ESTACAO" = "CD_ESTACAO"))
-
+temperatura <- read_csv("TEMPERATURA/TEMPERATURA/AUTOMATICAS/2023.csv")
 
 temperatura <- temperatura %>%
   mutate(
@@ -15,18 +11,44 @@ temperatura <- temperatura %>%
     Mes = month(DATA, label = TRUE, abbr = FALSE) 
   )
 
-temperatura <- temperatura[c(4, 6, 1, 2, 3, 13)]
+temperatura <- temperatura[c(1,4,5,6,2,3)]
 
 temperatura$Mes <- toupper(temperatura$Mes)
 
+estacoesAuto <-  read.delim("TEMPERATURA/ESTACOES/CatalogoEstaçõesAutomáticas.csv", sep = ";", header = TRUE, dec = ",", fileEncoding = "latin1")
+
 temperatura <- temperatura %>%
-  inner_join(normal_pivot, by = c("ESTADO" = "SG_ESTADO", "DC_NOME" = "DC_NOME", "Mes" = "Mes"))
+  inner_join(estacoesAuto, by = c("CODIGO_ESTACAO" = "CD_ESTACAO"))
+
+temperatura <- temperatura[c(1,2,7,3,4,5,6)]
+
+temperatura <- temperatura %>%
+  inner_join(normal_pivot, by = c("CODIGO_ESTACAO" = "CD_ESTACAO", "Mes" = "Mes"))
 
 temperatura$temperatura_maxima[is.infinite(temperatura$temperatura_maxima)] <- NA
 temperatura$temperatura_minima[is.infinite(temperatura$temperatura_minima)] <- NA
 
-temperatura$diff_max <- temperatura$temperatura_maxima - temperatura$Max
-temperatura$diff_min <- temperatura$temperatura_minima - temperatura$Min
+temperatura <- temperatura[c(2,10,1,5,6,7,11,12)]
+
+#write_xlsx(temperatura, path = "TEMPERATURA/dados_vakudar.xlsx")
+
+# Substituir vírgulas por pontos e converter para numérico
+temperatura$temperatura_maxima <- as.numeric(gsub(",", ".", temperatura$temperatura_maxima))
+temperatura$temperatura_minima <- as.numeric(gsub(",", ".", temperatura$temperatura_minima))
+temperatura$Max <- as.numeric(gsub(",", ".", temperatura$Max))
+temperatura$Min <- as.numeric(gsub(",", ".", temperatura$Min))
+
+temperatura <- temperatura %>%
+  group_by(ESTADO,	Codigo_IBGE,	DATA,	Mes) %>%
+  summarise(
+    media_temperatura_maxima = mean(temperatura_maxima, na.rm = TRUE),
+    media_temperatura_minima = mean(temperatura_minima, na.rm = TRUE),
+    media_max = mean(Max, na.rm = TRUE),
+    media_min = mean(Min, na.rm = TRUE)
+  )
+
+temperatura$diff_max <- temperatura$media_temperatura_maxima - temperatura$media_max
+temperatura$diff_min <- temperatura$media_temperatura_minima - temperatura$media_max
 
 temperatura <- temperatura %>%
   mutate(anomalia_max = ifelse(diff_max >= 5, 1, 0)) %>%
