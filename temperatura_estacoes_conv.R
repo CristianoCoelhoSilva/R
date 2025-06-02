@@ -3,7 +3,9 @@ library(lubridate)
 library(dplyr)
 library(lubridate)
 
-temperaturaConv <- read_csv("TEMPERATURA/TEMPERATURA/CONVENCIONAIS/2023.csv")
+ano <- 2019
+
+temperaturaConv <- read_csv(paste0("TEMPERATURA/TEMPERATURA/CONVENCIONAIS/", ano, ".csv"))
 
 temperaturaConv <- temperaturaConv %>%
   mutate(
