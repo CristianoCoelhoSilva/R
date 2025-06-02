@@ -61,8 +61,6 @@ normal_max <- rbind(Base_Auto_MAX, Base_Conv_MAX)
 
 rm(list = setdiff(ls(), c("normal_max","estacoesAuto","estacoesConv")))
 
-#normal_max <- unique(normal_max)
-
 Normal_TMIN <- read_excel("TEMPERATURA/NORMAIS/Normal-Climatologica-TMIN.xlsx")
 
 Base_Conv_TMIN <- inner_join(estacoesConv, Normal_TMIN, by = c("CD_ESTACAO" = "Código"))
@@ -91,12 +89,28 @@ dados_cidades <- unique(dados_cidades)
 
 dados_cidades$Codigo_IBGE <- NA
 
-municipios_br <- read_municipality(year = 2020) %>%
-  st_drop_geometry() %>%
-  select(abbrev_state, name_muni, code_muni) %>% 
-  mutate(name_muni = toupper(name_muni))
+#municipios_br <- read_municipality(year = 2020) %>%
+#    st_drop_geometry() %>%
+#    select(abbrev_state, name_muni, code_muni) %>% 
+#    mutate(name_muni = toupper(name_muni))
+
+municipios_br <- read_excel("TEMPERATURA/MUNICIPIOS/RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls")
 
 municipios_br$name_muni <- iconv(municipios_br$name_muni, from = "UTF-8", to = "ASCII//TRANSLIT")
+
+municipios_br$name_muni <- toupper(municipios_br$name_muni)
+
+map_uf_sigla <- c(
+  "11" = "RO", "12" = "AC", "13" = "AM", "14" = "RR", "15" = "PA",
+  "16" = "AP", "17" = "TO", "21" = "MA", "22" = "PI", "23" = "CE",
+  "24" = "RN", "25" = "PB", "26" = "PE", "27" = "AL", "28" = "SE",
+  "29" = "BA", "31" = "MG", "32" = "ES", "33" = "RJ", "35" = "SP",
+  "41" = "PR", "42" = "SC", "43" = "RS", "50" = "MS", "51" = "MT",
+  "52" = "GO", "53" = "DF"
+)
+
+municipios_br$sigla_uf <- map_uf_sigla[as.character(municipios_br$UF)]
+
 
 for (i in 1:nrow(dados_cidades)) {
   
@@ -104,13 +118,11 @@ for (i in 1:nrow(dados_cidades)) {
   cidade_atual <- dados_cidades$DC_NOME[i]
 
   match_ibge <- municipios_br %>%
-    filter(abbrev_state == estado_atual, name_muni == cidade_atual)
+    filter(sigla_uf == estado_atual, name_muni == cidade_atual)
   
   if (nrow(match_ibge) > 0) {
-    dados_cidades$Codigo_IBGE[i] <- match_ibge$code_muni[1]
+    dados_cidades$Codigo_IBGE[i] <- match_ibge$codigo[1]
   } else {
-    # Se não encontrar, pode tentar uma busca mais flexível ou deixar NA
-    # print(paste("Não encontrado:", cidade_atual, estado_atual)) # Para depuração
   }
 }
 
