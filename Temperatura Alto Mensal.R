@@ -128,14 +128,16 @@ temperatura <- temperatura %>%
   
   rm(list = setdiff(ls(), "temperatura"))
   
-  temperatura <- temperatura %>%  mutate(temperatura.temp_37 = ifelse(temperatura_maxima >= 37 & temperatura_maxima < 38, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(temperatura.temp_38 = ifelse(temperatura_maxima >= 38 & temperatura_maxima < 39, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(temperatura.temp_39 = ifelse(temperatura_maxima >= 39 & temperatura_maxima < 40, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(temperatura.temp_40 = ifelse(temperatura_maxima >= 40 & temperatura_maxima < 41, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(temperatura.temp_41 = ifelse(temperatura_maxima >= 41 & temperatura_maxima < 42, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(temperatura.temp_42 = ifelse(temperatura_maxima >= 42 & temperatura_maxima < 43, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(temperatura.temp_43 = ifelse(temperatura_maxima >= 43 & temperatura_maxima < 44, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(temperatura.temp_44 = ifelse(temperatura_maxima >= 44 & temperatura_maxima < 45, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(temperatura.temp_45 = ifelse(temperatura_maxima >= 45 & temperatura_maxima < 46, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(temp_37 = ifelse(temperatura_maxima >= 37 & temperatura_maxima < 38, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(temp_38 = ifelse(temperatura_maxima >= 38 & temperatura_maxima < 39, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(temp_39 = ifelse(temperatura_maxima >= 39 & temperatura_maxima < 40, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(temp_40 = ifelse(temperatura_maxima >= 40 & temperatura_maxima < 41, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(temp_41 = ifelse(temperatura_maxima >= 41 & temperatura_maxima < 42, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(temp_42 = ifelse(temperatura_maxima >= 42 & temperatura_maxima < 43, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(temp_43 = ifelse(temperatura_maxima >= 43 & temperatura_maxima < 44, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(temp_44 = ifelse(temperatura_maxima >= 44 & temperatura_maxima < 45, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(temp_45 = ifelse(temperatura_maxima >= 45 & temperatura_maxima < 46, TRUE, FALSE))
+  
+  temperatura$Codigo_IBGE <- as.numeric(temperatura$Codigo_IBGE)
   
   ################ 2562098

@@ -13,54 +13,30 @@ library(sqldf)
 library(readr)
 library(dplyr)
 set.seed('123')
+rm(list = setdiff(ls(), "base"))
 
-base <- dados_combinados
+baseRegressao <- base
 #base <- dados_combinados[dados_combinados$causabas_capitulo == 'IX.  Doenças do aparelho circulatório',]
 
-base <- base %>%
-  mutate(
-    ano = year(DTOBITO) 
-  )
+ibge <- read_csv("TEMPERATURA/MUNICIPIOS/ibge_2002_2019_comPopulacao.csv")
 
-ibge <- read_csv("TEMPERATURA/MORTALIDADE/ibge_2002_2019_comPopulacao.csv")
 ibge <- ibge %>%
     filter(POPULACAO > 0 & PIB > 0) %>%
     mutate(IBGE = floor(IBGE / 10))
 
 toRegress =
-  base %>%
-  group_by(ano, DTOBITO, anomalia_max
-           , idade_obito, def_sexo, def_raca_cor
-           , CODMUNRES) %>%
-  summarize(number_deaths = n()) %>%
-  ungroup() %>%
-  left_join(ibge %>%
-              select(ano = ANO,
+  baseRegressao %>%
+  inner_join(ibge %>%
+              select(ano_obito = ANO,
                      CODMUNRES = IBGE,
                      POPULACAO,
                      REGIAO
               ))
-  
-tudo =
-    base %>%
-    group_by(ano, DTOBITO, anomalia_max
-             , idade_obito, def_sexo, def_raca_cor
-             , CODMUNRES) %>%
-    summarize(number_deaths = n()) %>%
-    ungroup() %>%
-    left_join(ibge %>%
-                select(ano = ANO,
-                       CODMUNRES = IBGE,
-                       POPULACAO,
-                       REGIAO
-                ))
-
-toRegress <- tudo
 
 toRegress$Jovem <- ifelse(toRegress$idade_obito <= 19, 1, 0)
 toRegress$Idoso <- ifelse(toRegress$idade_obito >= 60, 1, 0)
 
-toRegress <- tudo %>%
+toRegress <- toRegress %>%
     filter(!(def_raca_cor %in% c("Ignorado", "Amarela"))) %>%
     mutate(def_raca_cor = case_when(
       def_raca_cor %in% c("Branca") ~ "Branca",
@@ -76,15 +52,18 @@ toRegress <- toRegress %>%
     )) %>%
     mutate(is_male = def_sexo == "Masculino")
   
-toRegress$Jovem <- ifelse(toRegress$idade_obito <= 19, 1, 0)
-toRegress$Idoso <- ifelse(toRegress$idade_obito >= 60, 1, 0)
 
-#names(toRegress) <- c("ano_obito", "data", "clima", "Age", "Gender", "Race", "Municipio", "number_deaths", "POPULACAO", "REGIAO", "is_white","is_male")
-names(toRegress) <- c("ano_obito", "data", "clima", "Age", "Gender", "Race", "Municipio", "number_deaths", "POPULACAO", "REGIAO", "Jovem","Idoso","Is_white","Is_male")
+#names(toRegress) <- c("ano_obito", "data", "clima", "Age", "Gender", "Race", "Municipio", "number_deaths", "POPULACAO", "REGIAO", "Jovem","Idoso","Is_white","Is_male")
 
 toRegress$taxa_mortalidade <- ((100 *  toRegress$number_deaths) / toRegress$POPULACAO)
 
-modelo <- feols(data = toRegress
-                , fml = log(1, taxa_mortalidade) ~  Jovem + clima | data)
+resultados_modelos <- list()
+
+toRegressFiltro <- toRegress[toRegress$temperatura_maxima <= 44.9, ]
+
+modelo <- feols(data = toRegressFiltro
+                , fml = taxa_mortalidade ~  temp_44 | DTOBITO)
+
+resultados_modelos[[doenca_desc]] <- modelo
 
 etable(modelo)
