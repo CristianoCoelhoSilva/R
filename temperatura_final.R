@@ -14,24 +14,12 @@ library(lubridate) # Embora não explicitamente usado neste bloco, é bom manter
 #' @examples
 #' # Supondo que 'temperatura_processada_2019' foi gerado pela função anterior:
 #' # resultado_final <- calcula_anomalias_temperatura(temperatura_processada_2019)
-calcula_anomalias_temperatura <- function(temperaturaAuto, temperaturaConv = NULL) {
+calcula_anomalias_temperatura <- function(temperaturaAuto, temperaturaConv) {
   
-  # Filtra linhas onde Codigo_IBGE é NA em temperaturaAuto
-  temperaturaAuto <- temperaturaAuto %>%
+  temperatura <- rbind(temperaturaAuto, temperaturaConv)
+  
+  temperatura<- temperatura %>%
     filter(!is.na(Codigo_IBGE))
-  
-  # O trecho abaixo está comentado no seu código original.
-  # Se você quiser incluir temperaturaConv no futuro, descomente e adapte.
-  # if (!is.null(temperaturaConv)) {
-  #   temperaturaConv <- temperaturaConv %>%
-  #     filter(!is.na(Codigo_IBGE))
-  #   temperatura <- rbind(temperaturaAuto, temperaturaConv)
-  # } else {
-  #   temperatura <- temperaturaAuto
-  # }
-  
-  # Para esta versão, usamos apenas temperaturaAuto, conforme seu script.
-  temperatura <- temperaturaAuto
   
   # Agrupa por estado, código IBGE, data e mês para calcular as médias
   temperatura <- temperatura %>%

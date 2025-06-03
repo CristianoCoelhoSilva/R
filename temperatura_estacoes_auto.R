@@ -21,10 +21,10 @@ library(writexl) # Necessário para write_xlsx
 #'
 #' # Se os arquivos estiverem em um caminho específico:
 #' # temperatura_2019_processada <- processa_temperatura_anual(2019, normal_data, base_path = "C:/Dados/")
-processa_temperatura_anual <- function(ano, normal_pivot, base_path = "") {
+processa_temperatura_auto <- function(ano, normal_pivot) {
   
   # Carrega os dados de temperatura automática para o ano especificado
-  temperaturaAuto <- read_csv(paste0(base_path, "TEMPERATURA/TEMPERATURA/AUTOMATICAS/", ano, ".csv"),
+  temperaturaAuto <- read_csv(paste0("TEMPERATURA/TEMPERATURA/AUTOMATICAS/", ano, ".csv"),
                               col_types = cols(DATA = col_character())) # Lê DATA como caractere inicialmente
   
   # Converte a coluna DATA para formato de data e extrai o mês
@@ -41,7 +41,7 @@ processa_temperatura_anual <- function(ano, normal_pivot, base_path = "") {
   temperaturaAuto$Mes <- toupper(temperaturaAuto$Mes)
   
   # Carrega o catálogo de estações automáticas
-  estacoesAuto <- read.delim(paste0(base_path, "TEMPERATURA/ESTACOES/CatalogoEstaçõesAutomáticas.csv"),
+  estacoesAuto <- read.delim(paste0("TEMPERATURA/ESTACOES/CatalogoEstaçõesAutomáticas.csv"),
                              sep = ";", header = TRUE, dec = ",", fileEncoding = "latin1")
   
   # Junta os dados de temperatura com as informações das estações automáticas

@@ -14,27 +14,28 @@ library(readr)
 library(dplyr)
 set.seed('123')
 
+
+gro <- dados_combinados %>% group_by(causabas_capitulo) %>% count()
+
+print(gro)
+
 lista_doencas <- c(
-  'Influenza [gripe] e pneumonia',
-  'Doenças crônicas das vias aéreas inferiores',
-  #'Infecções agudas das vias aéreas superiores',
-  'Doenças hipertensivas',
-  'Doenças isquêmicas do coração',
-  'Doenças cerebrovasculares',
-  'Doenças reumáticas crônicas do coração',
-  'Outras doenças bacterianas',
-  'Outras formas de doença do coração'
+  "IX.  Doenças do aparelho circulatório" ,
+  "X.   Doenças do aparelho respiratório",
+  "XVII.Malf cong deformid e anomalias cromossômicas",
+  "II.  Neoplasias (tumores)",
+  "VI.  Doenças do sistema nervoso",
+  "XI.  Doenças do aparelho digestivo",
+  "XII. Doenças da pele e do tecido subcutâneo",
+  "XX.  Causas externas de morbidade e mortalidade",
+  "I.   Algumas doenças infecciosas e parasitárias"
 )
 resultados_modelos <- list()
 
 for (doenca in lista_doencas) {
   
   
-  #base <- death[death$causabas_capitulo == 'XX.  Causas externas de morbidade e mortalidade',]
-  
-  base <- death
-  
-  base <- base[base$causabas_grupo == doenca,]
+  base <- dados_combinados[dados_combinados$causabas_capitulo == doenca,]
   
   base <- base %>%
     mutate(
@@ -43,7 +44,6 @@ for (doenca in lista_doencas) {
   
   ibge <- read_csv("TEMPERATURA/MORTALIDADE/ibge_2002_2019_comPopulacao.csv")
   ibge <- ibge %>%
-    filter(ANO == 2019) %>% # Filtra somente as linhas onde a coluna 'Ano' é 2019
     filter(POPULACAO > 0 & PIB > 0) %>%
     mutate(IBGE = floor(IBGE / 10))
   
@@ -87,7 +87,7 @@ for (doenca in lista_doencas) {
   toRegress$taxa_mortalidade <- (toRegress$number_deaths / toRegress$POPULACAO)
   
   modelo <- feols(data = toRegress
-                  , fml = log_taxa_mortalidade ~  clima | data)
+                  , fml = log_taxa_mortalidade ~  Jovem + clima | data)
   
   
   doenca_desc <- case_when(

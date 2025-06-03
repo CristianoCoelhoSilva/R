@@ -1,7 +1,7 @@
 library(readr)
 library(dplyr)
 
-diretorio_origem <- paste0('TEMPERATURA/TEMPERATURA/CONVENCIONAIS/2021')
+diretorio_origem <- paste0('TEMPERATURA/TEMPERATURA/CONVENCIONAIS/2016')
 arquivos_para_mover <- list.files(diretorio_origem, pattern = "\\.csv$", full.names = TRUE)
 
 dados_final <- data.frame(
@@ -62,4 +62,4 @@ for (caminho_arquivo in arquivos_para_mover) {
   
   dados_final <- bind_rows(dados_final, dados)
 }
-write_csv(dados_final, file = "TEMPERATURA/TEMPERATURA/CONVENCIONAIS/2021.csv")
+write_csv(dados_final, file = "TEMPERATURA/TEMPERATURA/CONVENCIONAIS/2016.csv")
