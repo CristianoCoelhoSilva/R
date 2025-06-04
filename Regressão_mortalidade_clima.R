@@ -16,7 +16,13 @@ set.seed('123')
 rm(list = setdiff(ls(), "base"))
 
 baseRegressao <- base
-#base <- dados_combinados[dados_combinados$causabas_capitulo == 'IX.  Doenças do aparelho circulatório',]
+
+baseRegressao <- baseRegressao[!baseRegressao$causabas_capitulo == 'XX.  Causas externas de morbidade e mortalidadea',]
+
+#baseRegressao <- baseRegressao[!baseRegressao$ESTADO %in% c('AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE', 'AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'), ]
+
+#codigos_ibge_capitais <- c(110020, 120040, 130260, 140010, 150140, 160030, 172100, 211130, 221100, 230440, 240810, 250750, 261160, 270430, 280030, 292740, 310620, 320530, 330455, 355030, 410690, 420540, 431490, 500270, 510340, 520870, 530010)
+#baseRegressao <- baseRegressao[baseRegressao$CODMUNRES %in% codigos_ibge_capitais, ]
 
 ibge <- read_csv("TEMPERATURA/MUNICIPIOS/ibge_2002_2019_comPopulacao.csv")
 
@@ -59,11 +65,22 @@ toRegress$taxa_mortalidade <- ((100 *  toRegress$number_deaths) / toRegress$POPU
 
 resultados_modelos <- list()
 
-toRegressFiltro <- toRegress[toRegress$temperatura_maxima <= 44.9, ]
+# Loop do 37 ao 45
+for (i in 37:44) {
 
-modelo <- feols(data = toRegressFiltro
-                , fml = taxa_mortalidade ~  temp_44 | DTOBITO)
 
-resultados_modelos[[doenca_desc]] <- modelo
+  explanatory_var_name <- paste0("temp_", i)
+  
+  fml_formula <- as.formula(paste0("taxa_mortalidade ~ ", explanatory_var_name, " | DTOBITO"))
+  
+  print(fml_formula)
+  
+  modelo <- feols(data = toRegress,
+                   fml = fml_formula, cluster = ~ DTOBITO + causabas_capitulo)
+    
+  model_name <- paste0('Temperatura ', i, '°C ')
+  resultados_modelos[[model_name]] <- modelo
+    
+}
 
-etable(modelo)
+etable(resultados_modelos)
