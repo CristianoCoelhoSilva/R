@@ -126,3 +126,26 @@ temperatura <- temperatura %>%
     inner_join(dados_cidades, by = c("ESTADO" = "ESTADO", "DC_NOME" = "DC_NOME"))
   
   temperatura$Codigo_IBGE <- as.numeric(temperatura$Codigo_IBGE)
+  
+  #temperatura <- temperatura %>%
+  #  arrange(Codigo_IBGE, DATA) %>%
+  #  group_by(Codigo_IBGE) %>%
+  #  mutate(
+  #    is_hot = temperatura_maxima > 35,
+  #    hot_run_id = cumsum(c(1, diff(is_hot) != 0)),
+  #    consecutive_hot_days = sequence(rle(is_hot)$lengths),
+  #    onda_calor = ifelse(is_hot & consecutive_hot_days >= 3, TRUE, FALSE)
+  #  ) %>%
+  #  ungroup()
+  
+#  temperatura$is_hot <- NULL
+#  temperatura$hot_run_id <- NULL
+#  temperatura$consecutive_hot_days <- NULL
+  
+  #write.csv(temperatura, "my_data.csv", row.names = FALSE)
+  
+  #rm(list = setdiff(ls(), "temperatura"))
+  temperatura <- temperatura %>%  mutate(Y25 = ifelse(temperatura_maxima >= 25, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(Y30 = ifelse(temperatura_maxima >= 30, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(Y35 = ifelse(temperatura_maxima >= 35, TRUE, FALSE))
+  temperatura <- temperatura %>%  mutate(Y40 = ifelse(temperatura_maxima >= 40, TRUE, FALSE))
