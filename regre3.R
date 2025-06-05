@@ -17,16 +17,11 @@ set.seed('123')
 
 baseRegressao <- base
 
-baseRegressao <- baseRegressao %>%  mutate(idoso = ifelse(idade_obito >= 60, TRUE, FALSE))
+baseRegressao <- baseRegressao %>%  mutate(Idoso = ifelse(idade_obito >= 60, TRUE, FALSE))
 
 baseRegressao$idade_obito <- NULL
 
 baseRegressao <- baseRegressao[!baseRegressao$causabas_capitulo %in% c('X. Doenças do aparelho respiratório'), ]
-
-#baseRegressao <- baseRegressao[!baseRegressao$ESTADO %in% c('AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE', 'AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO'), ]
-
-#codigos_ibge_capitais <- c(110020, 120040, 130260, 140010, 150140, 160030, 172100, 211130, 221100, 230440, 240810, 250750, 261160, 270430, 280030, 292740, 310620, 320530, 330455, 355030, 410690, 420540, 431490, 500270, 510340, 520870, 530010)
-#baseRegressao <- baseRegressao[baseRegressao$CODMUNRES %in% codigos_ibge_capitais, ]
 
 ibge <- read_csv("TEMPERATURA/MUNICIPIOS/ibge_2002_2019_comPopulacao.csv")
 
@@ -36,7 +31,7 @@ ibge <- ibge %>%
 
 tudo =
   baseRegressao %>%
-  group_by(ano_obito, DTOBITO, CODMUNRES, def_sexo, def_raca_cor, idoso, temperatura_maxima, Y25, Y30, Y35, Y40) %>%
+  group_by(ano_obito, DTOBITO, CODMUNRES, def_sexo, def_raca_cor, Idoso, temperatura_maxima, Y34, Y36, Y38, Y40) %>%
   summarize(number_deaths = n()) %>%
   ungroup() %>%
   left_join(ibge %>%
@@ -66,36 +61,6 @@ toRegress <- toRegress %>%
   )) %>%
   mutate(is_male = def_sexo == "Masculino")
 
-resultados_modelos <- list()
-
 modelo <- feols(data = toRegress,
-                  fml = taxa_mortalidade ~  Y25 | DTOBITO, cluster = ~ DTOBITO)
-  
-model_name <- paste0('Temp. acima 25 C°')
-resultados_modelos[[model_name]] <- modelo
-
-modelo <- feols(data = toRegress,
-                fml = taxa_mortalidade ~  Y30 | DTOBITO, cluster = ~ DTOBITO)
-
-model_name <- paste0('Temp. acima 30 C°')
-resultados_modelos[[model_name]] <- modelo
-
-modelo <- feols(data = toRegress,
-                fml = taxa_mortalidade ~  Y35 | DTOBITO, cluster = ~ DTOBITO)
-
-model_name <- paste0('Temp. acima 35 C°')
-resultados_modelos[[model_name]] <- modelo
-
-modelo <- feols(data = toRegress,
-                fml = taxa_mortalidade ~ + Y40 | DTOBITO)
-
-model_name <- paste0('Temp. acima 40 C°')
-resultados_modelos[[model_name]] <- modelo
-
-modelo <- feols(data = toRegress,
-                fml = log(1+taxa_mortalidade) ~ + Y40 | DTOBITO)
-
-model_name <- paste0('2 Temp. acima 40 C°')
-resultados_modelos[[model_name]] <- modelo
-
-etable(resultados_modelos)
+                  fml = taxa_mortalidade ~ Y34 + Y36 + Y38 + Y40| DTOBITO)
+etable(modelo)

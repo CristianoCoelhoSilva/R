@@ -46,6 +46,7 @@ temperatura <- temperatura %>%
   estacoesAuto$DC_NOME <- gsub("RIO DE JANEIRO - FORTE DE COPACABANA|RIO DE JANEIRO - JACAREPAGUA|RIO DE JANEIRO - VILA MILITAR|RIO DE JANEIRO-MARAMBAIA", "RIO DE JANEIRO", estacoesAuto$DC_NOME)
   estacoesAuto$DC_NOME <- gsub("AGUAS EMENDADAS|BRAZLANDIA|GAMA \\(PONTE ALTA\\)|PARANOA \\(COOPA-DF\\)", "BRASILIA", estacoesAuto$DC_NOME)
   estacoesAuto$DC_NOME <- gsub("BELO HORIZONTE - PAMPULHA|BELO HORIZONTE - CERCADINHO", "BELO HORIZONTE", estacoesAuto$DC_NOME)
+  estacoesAuto$DC_NOME <- gsub("PORTO ALEGRE - JARDIM BOTANICO", "PORTO ALEGRE", estacoesAuto$DC_NOME)
   
   # Junta os dados de temperatura com as informações das estações automáticas
   temperatura <- temperatura %>%
@@ -80,7 +81,7 @@ temperatura <- temperatura %>%
   ##temperatura$Min <- as.numeric(gsub(",", ".", temperatura$Min))
   
   temperatura <- temperatura %>%
-    group_by(DATA, Mes, Ano, DC_NOME, ESTADO, CODIGO_ESTACAO) %>%
+    group_by(DATA, Mes, Ano, DC_NOME, ESTADO) %>%
     summarise(
       temperatura_maxima = mean(temperatura_maxima, na.rm = TRUE),
       .groups = 'drop' # Corrigido: vírgula antes e dentro da função summarise
@@ -124,8 +125,16 @@ temperatura <- temperatura %>%
   
   temperatura <- temperatura %>%
     inner_join(dados_cidades, by = c("ESTADO" = "ESTADO", "DC_NOME" = "DC_NOME"))
-  
+
   temperatura$Codigo_IBGE <- as.numeric(temperatura$Codigo_IBGE)
+  temperatura$Codigo_IBGE <- substr(temperatura$Codigo_IBGE, 1, 6)
+  temperatura$Codigo_IBGE <- as.numeric(temperatura$Codigo_IBGE)
+  codigos_ibge_capitais <- c(110020, 120040, 130260, 140010, 150140, 160030, 172100, 211130, 221100, 230440, 240810, 250750, 261160, 270430, 280030, 292740, 310620, 320530, 330455, 355030, 410690, 420540, 431490, 500270, 510340, 520870, 530010)
+  temperatura <- temperatura[temperatura$Codigo_IBGE %in% codigos_ibge_capitais, ]
+
+  
+  cidade_temperatura <- temperatura %>%
+    distinct(ESTADO)
   
   #temperatura <- temperatura %>%
   #  arrange(Codigo_IBGE, DATA) %>%
@@ -144,8 +153,15 @@ temperatura <- temperatura %>%
   
   #write.csv(temperatura, "my_data.csv", row.names = FALSE)
   
+  temperatura <- temperatura %>%
+    mutate(Y34 = ifelse(temperatura_maxima >= 34 & temperatura_maxima < 36, TRUE, FALSE))
+  
   #rm(list = setdiff(ls(), "temperatura"))
-  temperatura <- temperatura %>%  mutate(Y25 = ifelse(temperatura_maxima >= 25, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(Y30 = ifelse(temperatura_maxima >= 30, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(Y35 = ifelse(temperatura_maxima >= 35, TRUE, FALSE))
-  temperatura <- temperatura %>%  mutate(Y40 = ifelse(temperatura_maxima >= 40, TRUE, FALSE))
+  temperatura <- temperatura %>%
+    mutate(Y36 = ifelse(temperatura_maxima >= 36 & temperatura_maxima < 38, TRUE, FALSE))
+  
+  temperatura <- temperatura %>%
+    mutate(Y38 = ifelse(temperatura_maxima >= 38 & temperatura_maxima < 40, TRUE, FALSE))
+  
+  temperatura <- temperatura %>%
+    mutate(Y40 = ifelse(temperatura_maxima >= 40 , TRUE, FALSE))

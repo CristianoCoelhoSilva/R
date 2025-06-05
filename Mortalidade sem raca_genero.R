@@ -8,7 +8,7 @@ library(readr)
 library(dplyr)
 library(purrr) # Para a função map_df
 
-pasta_de_arquivos <- 'TEMPERATURA/MORTALIDADE/ESTUDO'
+pasta_de_arquivos <- 'TEMPERATURA/MORTALIDADE/ESTUDOS'
 
 todos_os_arquivos <- list.files(path = pasta_de_arquivos, pattern = "\\.csv$", full.names = TRUE)
 
@@ -20,16 +20,9 @@ indices_7_digitos <- nchar(as.character(mortalidade$DTOBITO)) == 7
 mortalidade$DTOBITO[indices_7_digitos] <- paste0("0", mortalidade$DTOBITO[indices_7_digitos])
 mortalidade$DTOBITO <- as.Date(as.character(mortalidade$DTOBITO), format = "%d%m%Y")
 
-#mortalidade = mortalidade %>%
-#  group_by(ano_obito, DTOBITO, CODMUNRES, causabas_capitulo) %>%
-#  summarize(number_deaths = n(), .groups = "drop")
-
-temperatura$Codigo_IBGE <- substr(temperatura$Codigo_IBGE, 1, 6)
-temperatura$Codigo_IBGE <- as.numeric(temperatura$Codigo_IBGE)
-
 base <- mortalidade %>%
   inner_join(temperatura, by = c("CODMUNRES" = "Codigo_IBGE", "DTOBITO" = "DATA"), relationship = "many-to-many")
 
 #base <- base[c(1,2,3,4,5,6,7,8,12,14,15,16,17,18,19,20,21,22,23)]
 
-rm(list = setdiff(ls(), "base","temperatura","mortalidade"))
+rm(list = setdiff(ls(), "base"))
