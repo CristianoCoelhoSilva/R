@@ -132,26 +132,24 @@ temperatura <- temperatura %>%
   codigos_ibge_capitais <- c(110020, 120040, 130260, 140010, 150140, 160030, 172100, 211130, 221100, 230440, 240810, 250750, 261160, 270430, 280030, 292740, 310620, 320530, 330455, 355030, 410690, 420540, 431490, 500270, 510340, 520870, 530010)
   temperatura <- temperatura[temperatura$Codigo_IBGE %in% codigos_ibge_capitais, ]
 
+  Normal_TMAX <- read_excel("TEMPERATURA/NORMAIS/Normal-Climatologica-TMAX.xlsx")
+  Normal_TMAX <- Normal_TMAX[c(2,3,4,5,6,7,8,9,10,11,12,13,14,15)]
   
-  cidade_temperatura <- temperatura %>%
-    distinct(ESTADO)
+  Normal_TMAX <- Normal_TMAX %>%
+    mutate(across(Janeiro:Dezembro, ~ as.numeric(gsub(",", ".", .)))) %>%
+    pivot_longer(
+      cols = Janeiro:Dezembro,
+      names_to = "Mes",
+      values_to = "Temperatura_Normal"
+    ) %>%
+    arrange(`Nome da Estação`, UF)
   
-  #temperatura <- temperatura %>%
-  #  arrange(Codigo_IBGE, DATA) %>%
-  #  group_by(Codigo_IBGE) %>%
-  #  mutate(
-  #    is_hot = temperatura_maxima > 35,
-  #    hot_run_id = cumsum(c(1, diff(is_hot) != 0)),
-  #    consecutive_hot_days = sequence(rle(is_hot)$lengths),
-  #    onda_calor = ifelse(is_hot & consecutive_hot_days >= 3, TRUE, FALSE)
-  #  ) %>%
-  #  ungroup()
+  Normal_TMAX$Mes <- toupper(Normal_TMAX$Mes)
   
-#  temperatura$is_hot <- NULL
-#  temperatura$hot_run_id <- NULL
-#  temperatura$consecutive_hot_days <- NULL
+  temperatura <- inner_join(temperatura, Normal_TMAX, by = c("ESTADO" = "UF", "DC_NOME" = "Nome da Estação", 'Mes' = 'Mes'))
   
   #write.csv(temperatura, "my_data.csv", row.names = FALSE)
+  temperatura$temperatura_quadrado <- temperatura$temperatura_maxima^2  
   
   temperatura <- temperatura %>%
     mutate(Y34 = ifelse(temperatura_maxima >= 34 & temperatura_maxima < 36, TRUE, FALSE))
@@ -165,3 +163,55 @@ temperatura <- temperatura %>%
   
   temperatura <- temperatura %>%
     mutate(Y40 = ifelse(temperatura_maxima >= 40 , TRUE, FALSE))
+  
+  temperatura <- temperatura %>%
+    arrange(DC_NOME, DATA)
+  
+  temperatura <- temperatura %>%
+    group_by(DC_NOME) %>% 
+    mutate(temperatura_media_3dias = zoo::rollmeanr(temperatura_maxima, k = 3, fill = NA, align = "right")) %>%
+    ungroup()
+  
+  temperatura <- temperatura %>%
+    group_by(DC_NOME) %>% 
+    mutate(temperatura_media_30dias = zoo::rollmeanr(temperatura_maxima, k = 30, fill = NA, align = "right")) %>%
+    ungroup()
+  
+  temperatura$EHISIG <- temperatura$temperatura_media_3dias - temperatura$Temperatura_Normal
+  temperatura$EHIACCL <- temperatura$temperatura_media_3dias - temperatura$temperatura_media_30dias
+  temperatura$EHF <- temperatura$EHISIG * temperatura$EHIACCL
+
+  rm(list = setdiff(ls(), "temperatura"))
+  
+  
+  #library(writexl)
+  #write_xlsx(temperatura, "my_output_data.xlsx")
+  
+  library(dplyr)
+  
+  EHF85_por_cidade <- temperatura %>%
+    filter(EHF > 0) %>%
+    group_by(DC_NOME) %>%
+    summarise(
+      EHF85 = as.numeric(quantile(EHF, probs = 0.85, na.rm = TRUE))
+    ) %>%
+    ungroup()
+
+  temperatura <- temperatura %>%
+    left_join(EHF85_por_cidade, by = "DC_NOME")
+
+  
+  temperatura <- temperatura %>%
+    mutate(
+      Intensidade_HW = case_when(
+        # Ensure EHF and EHF85 are treated as numeric before comparison
+        as.numeric(EHF) > (3 * as.numeric(EHF85)) ~ "Extrema",
+        as.numeric(EHF) > as.numeric(EHF85)       ~ "Severa",
+        as.numeric(EHF) > 0                     ~ "Baixa Intensidade", # For positive EHF below EHF85
+        TRUE                                    ~ "Não HW"             # Default for EHF <= 0 or other cases
+      )
+    )
+  
+  temperatura$Extrema <- temperatura$Intensidade_HW == "Extrema"
+  temperatura$Severa <- temperatura$Intensidade_HW == "Severa"
+  temperatura$Baixa <- temperatura$Intensidade_HW == "Baixa Intensidade"

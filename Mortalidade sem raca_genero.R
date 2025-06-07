@@ -8,7 +8,7 @@ library(readr)
 library(dplyr)
 library(purrr) # Para a função map_df
 
-pasta_de_arquivos <- 'TEMPERATURA/MORTALIDADE/ESTUDOS'
+pasta_de_arquivos <- 'TEMPERATURA/MORTALIDADE/ESTUDO'
 
 todos_os_arquivos <- list.files(path = pasta_de_arquivos, pattern = "\\.csv$", full.names = TRUE)
 
@@ -22,7 +22,5 @@ mortalidade$DTOBITO <- as.Date(as.character(mortalidade$DTOBITO), format = "%d%m
 
 base <- mortalidade %>%
   inner_join(temperatura, by = c("CODMUNRES" = "Codigo_IBGE", "DTOBITO" = "DATA"), relationship = "many-to-many")
-
-#base <- base[c(1,2,3,4,5,6,7,8,12,14,15,16,17,18,19,20,21,22,23)]
 
 rm(list = setdiff(ls(), "base"))
