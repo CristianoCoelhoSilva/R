@@ -40,7 +40,7 @@ baseRegressao$idade_obito <- NULL
 
 baseRegressao <- baseRegressao[!baseRegressao$causabas_capitulo %in% c('XX.  Causas externas de morbidade e mortalidade'), ]
 
-ibge <- read_csv("MUNICIPIOS/ibge_2002_2023_comPopulacao.csv")
+ibge <- read_csv("TEMPERATURA/MUNICIPIOS/ibge_2002_2023_comPopulacao.csv")
 
 tudo =
   baseRegressao %>%

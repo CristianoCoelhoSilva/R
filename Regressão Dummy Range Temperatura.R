@@ -13,7 +13,7 @@ library(sqldf)
 library(readr)
 library(dplyr)
 set.seed('123')
-#rm(list = setdiff(ls(), "base"))
+rm(list = setdiff(ls(), "base"))
 
 baseRegressao <- base
 
@@ -39,9 +39,12 @@ baseRegressao <- baseRegressao %>%  mutate(Idoso = ifelse(idade_obito >= 60, TRU
 
 baseRegressao$idade_obito <- NULL
 
-baseRegressao <- baseRegressao[!baseRegressao$causabas_capitulo %in% c('XX.  Causas externas de morbidade e mortalidade'), ]
+baseRegressao <- baseRegressao[!baseRegressao$causabas_capitulo %in% c('XX.  Causas externas de morbidade e mortalidade'
+                                                                      ,'VII. Doenças do olho e anexos'
+                                                                      ,'VIII.Doenças do ouvido e da apófise mastóide'
+                                                                      ,'XV.  Gravidez parto e puerpério'), ]
 
-ibge <- read_csv("MUNICIPIOS/ibge_2002_2023_comPopulacao.csv")
+ibge <- read_csv("TEMPERATURA/MUNICIPIOS/ibge_2002_2023_comPopulacao.csv")
 
 tudo =
   baseRegressao %>%
@@ -76,5 +79,5 @@ toRegress <- toRegress %>%
   mutate(is_male = def_sexo == "Masculino")
 
 modelo <- feols(data = toRegress,
-                  fml = taxa_mortalidade ~ Y34 + Y36 + Y38 + Y40| DTOBITO)
+                  fml = taxa_mortalidade ~ Y34 + Y36 + Y38 + Y40 | DTOBITO)
 etable(modelo)

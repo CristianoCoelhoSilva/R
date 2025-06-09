@@ -14,25 +14,16 @@ todos_os_arquivos <- list.files(path = pasta_de_arquivos, pattern = "\\.csv$", f
 
 mortalidade <- map_df(todos_os_arquivos, read_csv)
 
-mortalidade <- mortalidade[c(2,5,6,8,12,13,14)]
+#mortalidade <- mortalidade[c(2,5,6,8,12,13,14)]
+
+codigos_ibge_capitais <- c(110020, 120040, 130260, 140010, 150140, 160030, 172100, 211130, 221100, 230440, 240810, 250750, 261160, 270430, 280030, 292740, 310620, 320530, 330455, 355030, 410690, 420540, 431490, 500270, 510340, 520870, 530010)
+mortalidade <- mortalidade[mortalidade$CODMUNRES %in% codigos_ibge_capitais, ]
 
 indices_7_digitos <- nchar(as.character(mortalidade$DTOBITO)) == 7
 mortalidade$DTOBITO[indices_7_digitos] <- paste0("0", mortalidade$DTOBITO[indices_7_digitos])
 mortalidade$DTOBITO <- as.Date(as.character(mortalidade$DTOBITO), format = "%d%m%Y")
 
-mortalidade = mortalidade %>%
-  group_by(ano_obito, DTOBITO, idade_obito, def_sexo, def_raca_cor, CODMUNRES, causabas_capitulo) %>%
-  summarize(number_deaths = n(), .groups = "drop")
-
-temperatura$Codigo_IBGE <- substr(temperatura$Codigo_IBGE, 1, 6)
-temperatura$Codigo_IBGE <- as.numeric(temperatura$Codigo_IBGE)
-
 base <- mortalidade %>%
-  inner_join(temperatura, by = c("CODMUNRES" = "Codigo_IBGE", "DTOBITO" = "DATA"))
+  inner_join(temperatura, by = c("CODMUNRES" = "Codigo_IBGE", "DTOBITO" = "DATA"), relationship = "many-to-many")
 
-#base <- base[c(1,2,3,4,5,6,7,8,12,14,15,16,17,18,19,20,21,22,23)]
-
-#rm(list = setdiff(ls(), "base"))
-
-
-gc()
+rm(list = setdiff(ls(), "base"))
