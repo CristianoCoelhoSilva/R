@@ -1,21 +1,15 @@
 library(readr)
 library(dplyr)
 library(lubridate)
-library(readxl) # Necessário para read_excel se a função anterior não for chamada
-library(tidyr)  # Necessário para pivot_longer/wider se a função anterior não for chamada
-library(writexl) # Necessário para write_xlsx
+library(readxl)
+library(tidyr) 
+library(writexl)
 library(readr)
 library(dplyr)
 library(purrr) # Para a função map_df
 
-pasta_de_arquivos <- 'TEMPERATURA/TEMPERATURA/AUTOMATICAS'
+pasta_de_arquivos <- 'TEMPERATURA/AUTOMATICAS'
 
-#source('TEMPERATURA/TEMPERATURA_CODES/Normais_estacoes.R')
-#normal_pivot <- processa_dados_temperatura(base_path = '')
-
-# --- 3. Listar todos os arquivos na pasta ---
-# Use o padrão "*.csv" se você tiver outros tipos de arquivos na pasta e quiser apenas CSVs.
-# full.names = TRUE garante que o caminho completo do arquivo seja retornado.
 todos_os_arquivos <- list.files(path = pasta_de_arquivos, pattern = "\\.csv$", full.names = TRUE)
 
 temperatura <- map_df(todos_os_arquivos, read_csv)
@@ -34,7 +28,7 @@ temperatura <- temperatura %>%
   temperatura$Mes <- toupper(temperatura$Mes)
   
   # Carrega o catálogo de estações automáticas
-  estacoesAuto <- read.delim(paste0("TEMPERATURA/ESTACOES/CatalogoEstaçõesAutomáticas.csv"),
+  estacoesAuto <- read.delim(paste0("ESTACOES/CatalogoEstaçõesAutomáticas.csv"),
                              sep = ";", header = TRUE, dec = ",", fileEncoding = "latin1")
   
   estacoesAuto$OLD_NAME <- estacoesAuto$DC_NOME
@@ -57,10 +51,8 @@ temperatura <- temperatura %>%
   
   # Substitui valores infinitos por NA nas colunas de temperatura
   temperatura$temperatura_maxima[is.infinite(temperatura$temperatura_maxima)] <- NA
-  #temperatura$temperatura_minima[is.infinite(temperatura$temperatura_minima)] <- NA
   
   temperatura$temperatura_maxima[temperatura$temperatura_maxima == -9999] <- NA
-  #temperatura$temperatura_minima[temperatura$temperatura_minima == -9999] <- NA
   
   # Remove linhas onde tanto a temperatura máxima quanto a mínima são NA
   # temperatura <- temperatura %>% filter(!is.na(temperatura_maxima) | !is.na(temperatura_minima))
@@ -94,7 +86,7 @@ temperatura <- temperatura %>%
     unique() %>%
     mutate(Codigo_IBGE = NA_character_) # Usar NA_character_ para garantir que seja string
   
-  municipios_br <- read_excel("TEMPERATURA/MUNICIPIOS/RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls") %>%
+  municipios_br <- read_excel("MUNICIPIOS/RELATORIO_DTB_BRASIL_2024_MUNICIPIOS.xls") %>%
     mutate(name_muni = iconv(name_muni, from = "UTF-8", to = "ASCII//TRANSLIT"),
            name_muni = toupper(name_muni))
   
@@ -132,7 +124,7 @@ temperatura <- temperatura %>%
   codigos_ibge_capitais <- c(110020, 120040, 130260, 140010, 150140, 160030, 172100, 211130, 221100, 230440, 240810, 250750, 261160, 270430, 280030, 292740, 310620, 320530, 330455, 355030, 410690, 420540, 431490, 500270, 510340, 520870, 530010)
   temperatura <- temperatura[temperatura$Codigo_IBGE %in% codigos_ibge_capitais, ]
 
-  Normal_TMAX <- read_excel("TEMPERATURA/NORMAIS/Normal-Climatologica-TMAX.xlsx")
+  Normal_TMAX <- read_excel("NORMAIS/Normal-Climatologica-TMAX.xlsx")
   Normal_TMAX <- Normal_TMAX[c(2,3,4,5,6,7,8,9,10,11,12,13,14,15)]
   
   Normal_TMAX <- Normal_TMAX %>%
@@ -149,7 +141,7 @@ temperatura <- temperatura %>%
   temperatura <- inner_join(temperatura, Normal_TMAX, by = c("ESTADO" = "UF", "DC_NOME" = "Nome da Estação", 'Mes' = 'Mes'))
   
   #write.csv(temperatura, "my_data.csv", row.names = FALSE)
-  temperatura$temperatura_quadrado <- temperatura$temperatura_maxima^2  
+  #temperatura$temperatura_quadrado <- temperatura$temperatura_maxima^2  
   
   temperatura <- temperatura %>%
     mutate(Y34 = ifelse(temperatura_maxima >= 34 & temperatura_maxima < 36, TRUE, FALSE))
@@ -179,15 +171,10 @@ temperatura <- temperatura %>%
   
   temperatura$EHISIG <- temperatura$temperatura_media_3dias - temperatura$Temperatura_Normal
   temperatura$EHIACCL <- temperatura$temperatura_media_3dias - temperatura$temperatura_media_30dias
-  temperatura$EHF <- temperatura$EHISIG * temperatura$EHIACCL
+  
+  temperatura$EHF <- temperatura$EHISIG * pmax(1, temperatura$EHIACCL)
 
   rm(list = setdiff(ls(), "temperatura"))
-  
-  
-  #library(writexl)
-  #write_xlsx(temperatura, "my_output_data.xlsx")
-  
-  library(dplyr)
   
   EHF85_por_cidade <- temperatura %>%
     filter(EHF > 0) %>%
@@ -200,18 +187,17 @@ temperatura <- temperatura %>%
   temperatura <- temperatura %>%
     left_join(EHF85_por_cidade, by = "DC_NOME")
 
-  
   temperatura <- temperatura %>%
     mutate(
       Intensidade_HW = case_when(
-        # Ensure EHF and EHF85 are treated as numeric before comparison
-        as.numeric(EHF) > (3 * as.numeric(EHF85)) ~ "Extrema",
-        as.numeric(EHF) > as.numeric(EHF85)       ~ "Severa",
-        as.numeric(EHF) > 0                     ~ "Baixa Intensidade", # For positive EHF below EHF85
-        TRUE                                    ~ "Não HW"             # Default for EHF <= 0 or other cases
+        EHF > (3 * EHF85) ~ "Extrema",
+        EHF > EHF85 ~ "Severa",
+        EHF > 0 & EHF < EHF85  ~ "Baixa Intensidade", # Changed EHF < EHF85 to EHF <= EHF85
+        TRUE ~ "Não HW"
       )
     )
   
-  temperatura$Extrema <- temperatura$Intensidade_HW == "Extrema"
-  temperatura$Severa <- temperatura$Intensidade_HW == "Severa"
-  temperatura$Baixa <- temperatura$Intensidade_HW == "Baixa Intensidade"
+  temperatura$Extrema <- (temperatura$Intensidade_HW == "Extrema")
+  temperatura$Severa <- (temperatura$Intensidade_HW == "Severa")
+  temperatura$Baixa <- (temperatura$Intensidade_HW == "Baixa Intensidade") 
+  

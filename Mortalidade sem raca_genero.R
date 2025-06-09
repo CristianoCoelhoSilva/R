@@ -8,7 +8,7 @@ library(readr)
 library(dplyr)
 library(purrr) # Para a função map_df
 
-pasta_de_arquivos <- 'TEMPERATURA/MORTALIDADE/ESTUDO'
+pasta_de_arquivos <- 'MORTALIDADE/ESTUDO'
 
 todos_os_arquivos <- list.files(path = pasta_de_arquivos, pattern = "\\.csv$", full.names = TRUE)
 

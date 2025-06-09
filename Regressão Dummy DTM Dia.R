@@ -13,27 +13,27 @@ library(sqldf)
 library(readr)
 library(dplyr)
 set.seed('123')
-#rm(list = setdiff(ls(), "base"))
+rm(list = setdiff(ls(), "base"))
 
 baseRegressao <- base
 
 ###filtrar para regressão do range de temperatura
 baseRegressao <- baseRegressao[c("CODMUNRES"
-                                , "def_sexo"
-                                , "def_raca_cor"
-                                , "causabas_capitulo"
-                                , "idade_obito"
-                                , "ano_obito"
-                                , "DTOBITO"
-                                , "Mes"
-                                , "Ano"
-                                , "DC_NOME"
-                                , "ESTADO"
-                                , "temperatura_maxima"
-                                , "Y34"
-                                , "Y36"
-                                , "Y38"
-                                , "Y40")]
+                                 , "def_sexo"
+                                 , "def_raca_cor"
+                                 , "causabas_capitulo"
+                                 , "idade_obito"
+                                 , "ano_obito"
+                                 , "DTOBITO"
+                                 , "Mes"
+                                 , "Ano"
+                                 , "DC_NOME"
+                                 , "ESTADO"
+                                 , "temperatura_maxima"
+                                 ,"DIA_MES"
+                                 , "Extrema"
+                                 , "Severa"
+                                 , "Baixa")]
 
 baseRegressao <- baseRegressao %>%  mutate(Idoso = ifelse(idade_obito >= 60, TRUE, FALSE))
 
@@ -45,15 +45,15 @@ ibge <- read_csv("MUNICIPIOS/ibge_2002_2023_comPopulacao.csv")
 
 tudo =
   baseRegressao %>%
-  group_by(ano_obito, DTOBITO, CODMUNRES, def_sexo, def_raca_cor, Idoso, temperatura_maxima, Y34, Y36, Y38, Y40) %>%
+  group_by(ano_obito, DTOBITO, CODMUNRES, def_sexo, def_raca_cor, Idoso, temperatura_maxima, DIA_MES, Extrema, Severa, Baixa) %>%
   summarize(number_deaths = n()) %>%
   ungroup() %>%
   inner_join(ibge %>%
-              select(ano_obito = ANO,
-                     CODMUNRES = IBGE,
-                     POPULACAO,
-                     REGIAO
-              ))
+               select(ano_obito = ANO,
+                      CODMUNRES = IBGE,
+                      POPULACAO,
+                      REGIAO
+               ))
 
 toRegress =
   tudo %>%
@@ -76,5 +76,5 @@ toRegress <- toRegress %>%
   mutate(is_male = def_sexo == "Masculino")
 
 modelo <- feols(data = toRegress,
-                  fml = taxa_mortalidade ~ Y34 + Y36 + Y38 + Y40| DTOBITO)
+                fml = taxa_mortalidade ~ Baixa + Severa + Extrema | DIA_MES^CODMUNRES)
 etable(modelo)
