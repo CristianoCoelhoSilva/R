@@ -149,7 +149,34 @@ library(purrr)
   temperatura <- inner_join(temperatura, Normal_TMAX, by = c("ESTADO" = "UF", "DC_NOME" = "Nome da Estação", 'Mes' = 'Mes'))
   
   #write.csv(temperatura, "my_data.csv", row.names = FALSE)
-  #temperatura$temperatura_quadrado <- temperatura$temperatura_maxima^2  
+  #temperatura$temperatura_quadrado <- temperatura$temperatura_maxima^2
+  
+  temperatura <- temperatura %>%
+    arrange(DC_NOME, DATA)
+  
+  temperatura <- temperatura %>%
+    group_by(DC_NOME) %>% 
+    mutate(temperatura_media_3dias = zoo::rollmeanr(temperatura_maxima, k = 3, fill = NA, align = "right")) %>%
+    ungroup()
+  
+  temperatura <- temperatura %>%
+    group_by(DC_NOME) %>% 
+    mutate(temperatura_media_30dias = zoo::rollmeanr(temperatura_maxima, k = 30, fill = NA, align = "right")) %>%
+    ungroup()
+
+  temperatura$EHISIG <- temperatura$temperatura_media_3dias - temperatura$Temperatura_Normal
+  temperatura$EHIACCL <- temperatura$temperatura_media_3dias - temperatura$temperatura_media_30dias
+  
+  temperatura <- temperatura %>%
+    mutate(anomolia3 = ifelse(EHISIG >= 3 & EHISIG < 5 & EHIACCL > 0, TRUE, FALSE))
+  
+  temperatura <- temperatura %>%
+      mutate(anomolia5 = ifelse(EHISIG >= 5 & EHISIG < 7 & EHIACCL > 0, TRUE, FALSE))
+  
+  temperatura <- temperatura %>%
+    mutate(anomolia7 = ifelse(EHISIG >= 7 & EHIACCL > 0, TRUE, FALSE))
+  
+  #####Verificação por temperatura
   
   temperatura <- temperatura %>%
     mutate(Y34 = ifelse(temperatura_maxima >= 34 & temperatura_maxima < 36, TRUE, FALSE))
@@ -166,19 +193,6 @@ library(purrr)
   
   temperatura <- temperatura %>%
     arrange(DC_NOME, DATA)
-  
-  temperatura <- temperatura %>%
-    group_by(DC_NOME) %>% 
-    mutate(temperatura_media_3dias = zoo::rollmeanr(temperatura_maxima, k = 3, fill = NA, align = "right")) %>%
-    ungroup()
-  
-  temperatura <- temperatura %>%
-    group_by(DC_NOME) %>% 
-    mutate(temperatura_media_30dias = zoo::rollmeanr(temperatura_maxima, k = 30, fill = NA, align = "right")) %>%
-    ungroup()
-  
-  temperatura$EHISIG <- temperatura$temperatura_media_3dias - temperatura$Temperatura_Normal
-  temperatura$EHIACCL <- temperatura$temperatura_media_3dias - temperatura$temperatura_media_30dias
   
   temperatura$EHF <- temperatura$EHISIG * pmax(1, temperatura$EHIACCL)
 
