@@ -1,7 +1,4 @@
-validacao <- temperatura[c('DC_NOME','Ano', 'temperatura_maxima','Temperatura_Normal')] 
-
-validacao <- validacao[validacao$DC_NOME == 'PORTO VELHO',]
-
+validacao <- toRegress[c('DC_NOME','Ano', 'temperatura_maxima','Temperatura_Normal')] 
 
 library(dplyr)
 
@@ -34,10 +31,13 @@ validacao <- base %>%
     media_temperatura_maxima = mean(temperatura_maxima, na.rm = TRUE)
   )
 
+
 validacao <- base %>%
-  group_by(DC_NOME, Ano) %>%
+  group_by(ano_obito, DC_NOME) %>%
   summarise(
     media_temperatura_maxima = mean(temperatura_maxima, na.rm = TRUE)
   )
 
-validacao <- validacao[validacao$DC_NOME %in% c('BRASILIA', 'SAO PAULO', 'RECIFE'), ]
+write.csv(validacao, "capitais_europa.csv",
+          row.names = FALSE,
+          quote = FALSE)

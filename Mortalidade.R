@@ -25,5 +25,3 @@ mortalidade$DTOBITO <- as.Date(as.character(mortalidade$DTOBITO), format = "%d%m
 
 base <- mortalidade %>%
   inner_join(temperatura, by = c("CODMUNRES" = "Codigo_IBGE", "DTOBITO" = "DATA"), relationship = "many-to-many")
-
-rm(list = setdiff(ls(), "base","temperatura"))
