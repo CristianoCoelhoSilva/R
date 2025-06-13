@@ -46,6 +46,10 @@ base = sqldf("select CODMUNRES
                      end causabas_capitulo
                 from mortalidade")
 
+base <- base %>% group_by(causabas_capitulo) %>% count()
+
+
+print(base)
 
 mortalidade$CODMUNRES <- ifelse(
   nchar(mortalidade$CODMUNRES) == 7,           # Condição: se o número de caracteres for igual a 7

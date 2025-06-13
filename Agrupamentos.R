@@ -1,9 +1,11 @@
-validacao <- toRegress[c('DC_NOME','Ano', 'temperatura_maxima','Temperatura_Normal')] 
 
 library(dplyr)
 
+validacao <- temperatura #toRegress[c('DC_NOME','Ano', 'temperatura_maxima','Temperatura_Normal')] 
+#validacao <- toRegress[c('DC_NOME','Ano', 'temperatura_maxima','Temperatura_Normal')] 
+
 validacao <- validacao %>%
-  group_by(DC_NOME, Ano) %>%
+  group_by(Codigo_IBGE, Ano) %>%
   summarise(
     media_temperatura_maxima = mean(temperatura_maxima, na.rm = TRUE),
     media_temperatura_normal = mean(Temperatura_Normal, na.rm = TRUE)
