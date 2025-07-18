@@ -3,18 +3,15 @@ library(tidyr)
 library(readxl)
 
 data <- Grupo1
-#data <- data[-1, ]
-
-#data <- data[c(31,32,33,34,76,77)]
 
 colnames(data) <- make.unique(colnames(data))
 
 #Questão 18
-data <- data %>% select(18:30)
+data <- data %>% select(52:61)
 
 data <- corrigir_cabecalho(data)
 
-column_names_to_process <- names(data)[1:13]
+column_names_to_process <- names(data)[1:3]
 
 lista_strings <- c()
 

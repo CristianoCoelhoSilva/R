@@ -10,7 +10,7 @@
   
   data <- data[c(11,12,13,14,15,16,17)]
   
-  column_names_to_process <- names(data)[1:9]
+  column_names_to_process <- names(data)[1:7]
   
   lista_strings <- c()
   
