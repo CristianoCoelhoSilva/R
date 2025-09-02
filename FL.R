@@ -7,8 +7,6 @@ set.seed(2025)
 
 # Define simulation parameters
 n_respondents <- 251
-n_items <- 8
-
 
 ### -------------------------------------------------------------------------
 ### Step 3: CTT Reliability Analysis (Alpha and Omega)
@@ -18,7 +16,7 @@ n_items <- 8
 cat("--- Calculating Cronbach's Alpha ---\n")
 cat("NOTE: This is a common reliability measure for Likert scales, but it assumes all items are equally related to the construct, which is often not true.\n\n")
 
-alpha_results <- alpha(sim_data)
+alpha_results <- alpha(sim_data, check.keys=FALSE)
 print(alpha_results)
 
 cat("\n--- Key takeaway from alpha() ---\n")

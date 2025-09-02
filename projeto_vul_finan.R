@@ -70,7 +70,7 @@ data <- data %>%
     NoAnswer_esc = ifelse(Escolaridade == "Não informado", 1, 0)
   )
 
-
+ 
 # CRIA VARIAVEL SCHOOL = 1 SE Ensino Superior ou Pós-graduação
 
 data$School <- ifelse(data$College == 1 | data$PostGrad == 1, 1, 0)
@@ -107,8 +107,6 @@ data <- data %>%
 data$Low_income <- ifelse(data$Income_Until_1_SM == 1 | data$Income_1_3_SM == 1, 1, 0)
 
 data$High_income <- ifelse(data$Income_10_20_SM == 1 | data$Income_More_20_SM == 1, 1, 0)
-
-
 
 data <- data %>%
   mutate(
@@ -183,7 +181,6 @@ data <- data %>%
     FF6 = ifelse(`Qual das seguintes opções é inadequada como uma ação relacionada a transações na Internet? Escolha apenas uma resposta.` == "Fiz uma transferência bancária usando um computador em um cibercafé", 1, 0)
   )
 
-
 # cria a variavel FF = (FF1+FF2+FF3+FF4+FF5+FF6)/6
 
 data$FF <- (data$FF1 + data$FF2 + data$FF3 + data$FF4 + data$FF5 + data$FF6) / 6
@@ -201,82 +198,78 @@ data <- data %>%
     VF9 = ifelse(`Aluguel` == "Sim", 1, 0),
     VF10 = ifelse(`Pagamento de empréstimos para ompra de carros, televisores, computadores` == "Sim", 1, 0),
     VF11 = ifelse(`Outras contas` == "Sim", 1, 0),
-    VF12 = ifelse(`Nos últimos doze meses, eu ou algum membro do meu domicílio solicitou um empréstimo a um banco ou empresa financeira, mas esse pedido foi recusado.` == "Sim", 1, 0),
-    VF13 = ifelse(`A renda mensal de sua família atualmente permite que você chegue financeiramente bem ao final do mês.` == "Sim", 0, 1),
-    VF14 = ifelse(`Sua família seria capaz de lidar com uma despesa inesperada de R$1.500 reais hoje?` == "Sim", 0, 1)
-  )
-
+    VF12 = ifelse(`Nos últimos doze meses, eu ou algum membro do meu domicílio solicitou um empréstimo a um banco ou empresa financeira, mas esse pedido foi recusado.` == "sim", 1, 0),
+    VF13 = ifelse(`A renda mensal de sua família atualmente permite que você chegue financeiramente bem ao final do mês.` == "sim", 0, 1),
+    VF14 = ifelse(`Sua família seria capaz de lidar com uma despesa inesperada de R$1.500 reais hoje?` == "sim", 0, 1)
+    )
 # cria a variavel VF = (VF1+VF2+VF3+VF4+VF5+VF6+VF7+VF8+VF9+VF10+VF11+VF12+VF13+VF14)/14
 
 data$VF <- (data$VF1 + data$VF2 + data$VF3 + data$VF4 + data$VF5 + data$VF6 + data$VF7 + data$VF8 + data$VF9 + data$VF10 + data$VF11 + data$VF12 + data$VF13 + data$VF14) / 14
 
 
-
-
 data <- data %>%
   mutate(
     `CP1` = case_when(
-      `Antes de comprar algo, considero cuidadosamente se posso pagar.` == "Concordo Totalmente" ~ 4,
+      `Antes de comprar algo, considero cuidadosamente se posso pagar.` == "Concordo totalmente" ~ 4,
       `Antes de comprar algo, considero cuidadosamente se posso pagar.` == "Concordo" ~ 3,
       `Antes de comprar algo, considero cuidadosamente se posso pagar.` == "Discordo" ~ 2,
       `Antes de comprar algo, considero cuidadosamente se posso pagar.` == "Discordo totalmente" ~ 1
     ),
     `gestao` = case_when(
-      `Pago minhas contas em dia.` == "Concordo Totalmente" ~ 4,
+      `Pago minhas contas em dia.` == "Concordo totalmente" ~ 4,
       `Pago minhas contas em dia.` == "Concordo" ~ 3,
       `Pago minhas contas em dia.` == "Discordo" ~ 2,
       `Pago minhas contas em dia.` == "Discordo totalmente" ~ 1
     ),
     `herding` = case_when(
-      `Quando há vários produtos similares, costumo comprar o que é recomendado como o produto mais vendido, em vez do que eu realmente acho que é um bom produto.` == "Concordo Totalmente" ~ 4,
+      `Quando há vários produtos similares, costumo comprar o que é recomendado como o produto mais vendido, em vez do que eu realmente acho que é um bom produto.` == "Concordo totalmente" ~ 4,
       `Quando há vários produtos similares, costumo comprar o que é recomendado como o produto mais vendido, em vez do que eu realmente acho que é um bom produto.` == "Concordo" ~ 3,
       `Quando há vários produtos similares, costumo comprar o que é recomendado como o produto mais vendido, em vez do que eu realmente acho que é um bom produto.` == "Discordo" ~ 2,
       `Quando há vários produtos similares, costumo comprar o que é recomendado como o produto mais vendido, em vez do que eu realmente acho que é um bom produto.` == "Discordo totalmente" ~ 1
     ),
     `CP2` = case_when(
-      `Estabeleço metas financeiras de longo prazo e me esforço para alcançá-las.` == "Concordo Totalmente" ~ 4,
+      `Estabeleço metas financeiras de longo prazo e me esforço para alcançá-las.` == "Concordo totalmente" ~ 4,
       `Estabeleço metas financeiras de longo prazo e me esforço para alcançá-las.` == "Concordo" ~ 3,
       `Estabeleço metas financeiras de longo prazo e me esforço para alcançá-las.` == "Discordo" ~ 2,
       `Estabeleço metas financeiras de longo prazo e me esforço para alcançá-las.` == "Discordo totalmente" ~ 1
     ),
     `discount` = case_when(
-      `Acho mais satisfatório gastar dinheiro do que guardá-lo para o longo prazo.` == "Concordo Totalmente" ~ 4,
+      `Acho mais satisfatório gastar dinheiro do que guardá-lo para o longo prazo.` == "Concordo totalmente" ~ 4,
       `Acho mais satisfatório gastar dinheiro do que guardá-lo para o longo prazo.` == "Concordo" ~ 3,
       `Acho mais satisfatório gastar dinheiro do que guardá-lo para o longo prazo.` == "Discordo" ~ 2,
       `Acho mais satisfatório gastar dinheiro do que guardá-lo para o longo prazo.` == "Discordo totalmente" ~ 1
     ),
     `CP3` = case_when(
-      `Costumo viver para o hoje e deixar o amanhã cuidar de si mesmo.` == "Concordo Totalmente" ~ 4,
+      `Costumo viver para o hoje e deixar o amanhã cuidar de si mesmo.` == "Concordo totalmente" ~ 4,
       `Costumo viver para o hoje e deixar o amanhã cuidar de si mesmo.` == "Concordo" ~ 3,
       `Costumo viver para o hoje e deixar o amanhã cuidar de si mesmo.` == "Discordo" ~ 2,
       `Costumo viver para o hoje e deixar o amanhã cuidar de si mesmo.` == "Discordo totalmente" ~ 1
     ),
     `CP4` = case_when(
-      `Eu mantenho uma vigilância pessoal sobre meus assuntos financeiros.` == "Concordo Totalmente" ~ 4,
+      `Eu mantenho uma vigilância pessoal sobre meus assuntos financeiros.` == "Concordo totalmente" ~ 4,
       `Eu mantenho uma vigilância pessoal sobre meus assuntos financeiros.` == "Concordo" ~ 3,
       `Eu mantenho uma vigilância pessoal sobre meus assuntos financeiros.` == "Discordo" ~ 2,
       `Eu mantenho uma vigilância pessoal sobre meus assuntos financeiros.` == "Discordo totalmente" ~ 1
     ),
     `CP5` = case_when(
-      `Tenho muitas dívidas agora.` == "Concordo Totalmente" ~ 4,
+      `Tenho muitas dívidas agora.` == "Concordo totalmente" ~ 4,
       `Tenho muitas dívidas agora.` == "Concordo" ~ 3,
       `Tenho muitas dívidas agora.` == "Discordo" ~ 2,
       `Tenho muitas dívidas agora.` == "Discordo totalmente" ~ 1
     ),
     loss_aversion = case_when(
-      `Estou preparado para arriscar parte do meu próprio dinheiro ao poupar ou fazer um investimento.` == "Concordo Totalmente" ~ 4,
+      `Estou preparado para arriscar parte do meu próprio dinheiro ao poupar ou fazer um investimento.` == "Concordo totalmente" ~ 4,
       `Estou preparado para arriscar parte do meu próprio dinheiro ao poupar ou fazer um investimento.` == "Concordo" ~ 3,
       `Estou preparado para arriscar parte do meu próprio dinheiro ao poupar ou fazer um investimento.` == "Discordo" ~ 2,
       `Estou preparado para arriscar parte do meu próprio dinheiro ao poupar ou fazer um investimento.` == "Discordo totalmente" ~ 1
     ),
     `myopic` = case_when(
-      `Se eu tivesse a escolha de (1) receber 10.000 reais agora ou (2) receber 12.000 reais em um ano, eu escolheria (1), desde que eu possa definitivamente receber o dinheiro.` == "Concordo Totalmente" ~ 4,
+      `Se eu tivesse a escolha de (1) receber 10.000 reais agora ou (2) receber 12.000 reais em um ano, eu escolheria (1), desde que eu possa definitivamente receber o dinheiro.` == "Concordo totalmente" ~ 4,
       `Se eu tivesse a escolha de (1) receber 10.000 reais agora ou (2) receber 12.000 reais em um ano, eu escolheria (1), desde que eu possa definitivamente receber o dinheiro.` == "Concordo" ~ 3,
       `Se eu tivesse a escolha de (1) receber 10.000 reais agora ou (2) receber 12.000 reais em um ano, eu escolheria (1), desde que eu possa definitivamente receber o dinheiro.` == "Discordo" ~ 2,
       `Se eu tivesse a escolha de (1) receber 10.000 reais agora ou (2) receber 12.000 reais em um ano, eu escolheria (1), desde que eu possa definitivamente receber o dinheiro.` == "Discordo totalmente" ~ 1
     )
   )
-
 
 # criando a variavel CP2 = (CP1+ CP2 + CP3 + CP4 + CP5) /20
 
@@ -401,18 +394,318 @@ data <- data %>%
   )
 
 data_sumary <- data[c('FL','VF','Crypto','FF','CR','CP')]
-data_sumary$new_index <- data_sumary$VF + data_sumary$Crypto + data_sumary$FF + data_sumary$CR + data_sumary$CP
+
+summary(data_sumary)
 
 
-print(data_sumary)
-
-library(stargazer)
 
 
-fit_FL <- lm( FL~ new_index, data = data_sumary)
+###################################################################################
+
+#data <- data[c("FL", "CR","CP","Female","NonBinary","Black","Yellow","Brown","Indigenous","Young","Old","Low_income","High_income","loss_aversion","gestao","myopic","discount","herding")]
+
+#write.csv(data, "base_machine_learning.csv", row.names = FALSE)
+
+fit1 <- lm(FL ~ CR, data = data)
+
+# Print the summary of the regression model
+
+summary(fit1)
+
+data <- data %>%
+  mutate(
+    # Create a new variable based on fl_school
+    Dummy_fl_school = ifelse(fl_school == "Sim, e participei da educação financeira", 1, 0),
+    
+    # Create a new variable based on fl_knowledge
+    Dummy_fl_knowledge = ifelse(fl_knowledge %in% c("Concordo Totalmente", "Concordo Moderadamente"), 1, 0)
+  )
+
+
+# include in the regression Dummy_fl_school and Dummy_fl_knowledge as independent variables
+
+fit2 <- lm(FL ~ CR + Dummy_fl_school + Dummy_fl_knowledge, data = data)
+
+# Print the summary of the regression model
+
+summary(fit2)
+
+# include Female and Non_Binary as independent variables
+
+fit3 <- lm(FL ~ CR + Dummy_fl_school + Dummy_fl_knowledge +Female + NonBinary, data = data)
+
+# Print the summary of the regression model
+
+summary(fit3)
+
+# include black, brown, yellow, indigenous as independent variables
+
+fit4 <- lm(FL ~ CR + Dummy_fl_school + Dummy_fl_knowledge 
+           +Female + NonBinary + Black + Yellow + Brown + Indigenous, data = data)
+
+# Print the summary of the regression model
+
+summary(fit4)
+
+fit_FL <- lm(FL ~ CR + Dummy_fl_school + Dummy_fl_knowledge  +Female + NonBinary + Black + Yellow + Brown + Indigenous
+             + Income_1_3_SM + Income_10_20_SM  +Crypto + loss_aversion + gestao+
+               myopic + discount +herding, data = data)
+
+# Print the summary of the regression model
 
 summary(fit_FL)
 
-stargazer(fit_FL,type = "text")
+# is there multiconlinearity?
+# load package for vif
 
-print(data_sumary$FL)
+library(car)
+vif(fit_FL)
+
+
+# interpretation
+
+# The VIF values are all below 10, indicating that multicollinearity is not a significant issue in the model.
+
+# test the fit5 with heteroskedastic standard errors
+# load the package for heteroskedastic standard errors
+
+library(lmtest)
+library(sandwich)
+
+fit_FL_hc <- coeftest(fit_FL, vcov = vcovHC)
+
+# use stargazer to present the results fit5 with and without correction for
+# heteroskedastic standard errors
+
+
+##############################################################################
+
+
+
+fit_VF <- lm(VF ~ FL+FF+CR + Dummy_fl_school + Dummy_fl_knowledge  +Female + NonBinary + Black + Yellow + Brown + Indigenous
+             + Income_1_3_SM + Income_10_20_SM  +Crypto + loss_aversion + gestao+
+               myopic + discount +herding, data = data)
+
+# Print the summary of the regression model
+
+summary(fit_VF)
+
+# is there multiconlinearity?
+# load package for vif
+
+library(car)
+vif(fit_VF)
+
+
+# interpretation
+
+# The VIF values are all below 10, indicating that multicollinearity is not a significant issue in the model.
+
+# test the fit5 with heteroskedastic standard errors
+# load the package for heteroskedastic standard errors
+
+library(lmtest)
+library(sandwich)
+
+fit_VF_hc <- coeftest(fit_VF, vcov = vcovHC)
+
+# use stargazer to present the results fit5 with and without correction for
+# heteroskedastic standard errors
+
+
+##################################################################################
+
+
+fit_FF <- lm(FF ~ FL+CR + Dummy_fl_school + Dummy_fl_knowledge  +Female + NonBinary + Black + Yellow + Brown + Indigenous
+             + Income_1_3_SM + Income_10_20_SM  +Crypto + loss_aversion + gestao+
+               myopic + discount +herding, data = data)
+
+# Print the summary of the regression model
+
+summary(fit_FF)
+
+# is there multiconlinearity?
+# load package for vif
+
+library(car)
+vif(fit_FF)
+
+
+# interpretation
+
+# The VIF values are all below 10, indicating that multicollinearity is not a significant issue in the model.
+
+# test the fit5 with heteroskedastic standard errors
+# load the package for heteroskedastic standard errors
+
+library(lmtest)
+library(sandwich)
+
+fit_FF_hc <- coeftest(fit_FF, vcov = vcovHC)
+
+# use stargazer to present the results fit5 with and without correction for
+# heteroskedastic standard errors
+
+#################################################################################
+library(stargazer)
+
+# write what are the columns of the table 
+
+stargazer(fit_VF, fit_VF_hc, fit_FF, fit_FF_hc,type = "text")
+
+
+#####################################################333333
+fit_VF <- lm(VF ~ FL+CR +CP +Female + NonBinary + Black + Yellow + Brown + Indigenous
+             + Young +Old  + Low_income +High_income  + loss_aversion + gestao+
+               myopic + discount +herding, data = data)
+
+# Print the summary of the regression model
+
+summary(fit_VF)
+
+# is there multiconlinearity?
+# load package for vif
+
+library(car)
+vif(fit_VF)
+
+
+# interpretation
+
+# The VIF values are all below 10, indicating that multicollinearity is not a significant issue in the model.
+
+# test the fit5 with heteroskedastic standard errors
+# load the package for heteroskedastic standard errors
+
+library(lmtest)
+library(sandwich)
+
+fit_VF_hc <- coeftest(fit_VF, vcov = vcovHC)
+
+
+fit_FF <- lm(FF ~ FL+CR +CP +Female + NonBinary + Black + Yellow + Brown + Indigenous
+             + Young +Old  + Low_income +High_income  + loss_aversion + gestao+
+               myopic + discount +herding, data = data)
+
+# Print the summary of the regression model
+
+summary(fit_FF)
+
+# is there multiconlinearity?
+# load package for vif
+
+library(car)
+vif(fit_FF)
+
+
+# interpretation
+
+# The VIF values are all below 10, indicating that multicollinearity is not a significant issue in the model.
+
+# test the fit5 with heteroskedastic standard errors
+# load the package for heteroskedastic standard errors
+
+library(lmtest)
+library(sandwich)
+
+fit_FF_hc <- coeftest(fit_FF, vcov = vcovHC)
+
+fit_Crypto <- lm(Crypto ~ FL+CR +CP +Female + NonBinary + Black + Yellow + Brown + Indigenous
+                 + Young +Old + Low_income +High_income + loss_aversion + gestao+
+                   myopic + discount +herding, data = data)
+
+# Print the summary of the regression model
+
+summary(fit_Crypto)
+
+# is there multiconlinearity?
+# load package for vif
+
+library(car)
+vif(fit_Crypto)
+
+
+# interpretation
+
+# The VIF values are all below 10, indicating that multicollinearity is not a significant issue in the model.
+
+# test the fit5 with heteroskedastic standard errors
+# load the package for heteroskedastic standard errors
+
+library(lmtest)
+library(sandwich)
+
+fit_Crypto_hc <- coeftest(fit_Crypto, vcov = vcovHC)
+
+fit_Crypto <- lm(Crypto ~ FL+CR +CP +Female + NonBinary + Black + Yellow + Brown + Indigenous
+                 + Young +Old  + Low_income +High_income  + loss_aversion + gestao+
+                   myopic + discount +herding, data = data)
+
+# Print the summary of the regression model
+
+summary(fit_Crypto)
+
+# is there multiconlinearity?
+# load package for vif
+
+library(car)
+vif(fit_Crypto)
+
+
+# interpretation
+
+# The VIF values are all below 10, indicating that multicollinearity is not a significant issue in the model.
+
+# test the fit5 with heteroskedastic standard errors
+# load the package for heteroskedastic standard errors
+
+library(lmtest)
+library(sandwich)
+
+fit_Crypto_hc <- coeftest(fit_Crypto, vcov = vcovHC)
+
+fit_FL <- lm( FL~ CR +CP +Female + NonBinary + Black + Yellow + Brown + Indigenous
+              + Young +Old + Low_income +High_income + loss_aversion + gestao+
+                myopic + discount +herding, data = data)
+
+
+
+
+# Print the summary of the regression model
+
+summary(fit_FL)
+
+# is there multiconlinearity?
+# load package for vif
+
+library(car)
+vif(fit_FL)
+
+
+# interpretation
+
+# The VIF values are all below 10, indicating that multicollinearity is not a significant issue in the model.
+
+# test the fit5 with heteroskedastic standard errors
+# load the package for heteroskedastic standard errors
+
+library(lmtest)
+library(sandwich)
+
+fit_FL_hc <- coeftest(fit_FL, vcov = vcovHC)
+
+
+library(stargazer)
+
+# write what are the columns of the table 
+
+#stargazer(fit_FL, fit_FL_hc, fit_VF, fit_VF_hc, fit_FF, fit_FF_hc, fit_Crypto, fit_Crypto_hc,type = "text")
+
+#stargazer(fit_FL, fit_FL_hc, fit_VF, fit_VF_hc, fit_FF, fit_FF_hc,type = "text")
+
+# save the stargazer in text in C:/MODELO_VUL_FINAN/Modelo_vul_finan.txt
+
+stargazer(fit_FL, fit_FL_hc, fit_VF, fit_VF_hc, fit_FF, fit_FF_hc, type = "text", out = "Modelo_vul_finan.txt")
+
+stargazer(fit_Crypto, fit_Crypto_hc, type = "text", out = "crypto.txt")
+
